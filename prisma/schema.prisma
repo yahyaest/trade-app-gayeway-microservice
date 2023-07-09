@@ -16,6 +16,12 @@ model User {
   updatedAt        DateTime          @updatedAt
   email            String            @unique
   username         String?
+  role             Role              @default(USER)
   phone            Int?
   password         String
+}
+
+enum Role {
+  USER
+  ADMIN
 }

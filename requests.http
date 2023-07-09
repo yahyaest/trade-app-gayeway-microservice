@@ -1,0 +1,64 @@
+### login
+
+POST  http://localhost:3000/api/auth/signin
+Content-Type: application/json
+{
+ "email": "test@domain.com",
+ "password" : "123456789"
+}
+
+### Create a new user
+
+POST  http://localhost:3000/api/auth/signup
+Content-Type: application/json
+
+{
+ "email": "test@domain.com",
+ "password" : "123456789",
+ "phone" : 1234
+}
+
+POST  http://localhost:3000/users
+Content-Type: application/json
+
+{
+ "email": "qwerty@domain.com",
+ "password" : "123456789",
+ "phone" : 1234
+}
+
+### Find User with ID
+GET http://localhost:3000/users/1
+
+### Find all user
+GET http://localhost:3000/users
+
+### Find all user with query params
+GET http://localhost:3000/users?email=qwerty@domain.com&phone=1234
+
+### Update User with ID
+PATCH   http://localhost:3000/users/3
+Content-Type: application/json
+
+{
+ "phone": 1234
+}
+
+### Delete User with ID
+DELETE  http://localhost:3000/users/2
+
+
+deleted token admin then user
+
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEwLCJlbWFpbCI6ImFkbWluQGRvbWFpbi5jb20iLCJpYXQiOjE2ODg3NzE1NDYsImV4cCI6MTY4OTM3NjM0Nn0.bb6lu0G0AiET_mfTQjQ2Q_mQf5Gf9gCY411nQag8u0U
+
+
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjExLCJlbWFpbCI6InVzZXJAZG9tYWluLmNvbSIsImlhdCI6MTY4ODc3MjQ3MCwiZXhwIjoxNjg5Mzc3MjcwfQ.T56DMLqOSmb1qfeeCsvId2-a_sFIyDhM642WqSK0ais
+
+active token admin then user
+
+
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEyLCJlbWFpbCI6ImFkbWluQGRvbWFpbi5jb20iLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE2ODg3NzM4NTIsImV4cCI6MTY4OTM3ODY1Mn0.kUfRdqsNVt0oHruC7EzW-lSDwWosn1xDpJn37xuD1kk
+
+
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEzLCJlbWFpbCI6InVzZXJAZG9tYWluLmNvbSIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNjg4NzczODczLCJleHAiOjE2ODkzNzg2NzN9.H1WUwsiig0RLIMxYOgzWsF3PNh6cs-izMdAYwl4k7fE
