@@ -10,6 +10,7 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { AuthDto } from './dto/auth.dto';
+import { CustomLogger } from 'src/myLogger';
 
 @Injectable()
 export class AuthService {
@@ -18,6 +19,7 @@ export class AuthService {
     private jwt: JwtService,
     private config: ConfigService,
   ) {}
+  private readonly logger = new CustomLogger(AuthService.name);
 
   async signup(dto: AuthDto) {
     // Check user exist
@@ -31,12 +33,17 @@ export class AuthService {
         `User with email ${dto.email} already exist`,
         HttpStatus.FORBIDDEN,
       );
-    // generate the password hash
+    // Generate the password hash
     const hash = await argon.hash(dto.password);
-    // save the new user in the db
+    // Save the new user in the db
     try {
       user = await this.prisma.user.create({
-        data: { email: dto.email, password: hash, role: dto.role ? dto.role : "USER"  },
+        data: {
+          email: dto.email,
+          password: hash,
+          role: dto.role ? dto.role : 'USER',
+          username: dto.username ? dto.username : null,
+        },
       });
 
       return this.signToken(user.id, user.email, user.role);
@@ -46,7 +53,7 @@ export class AuthService {
           throw new ForbiddenException('Credentials taken');
         }
       }
-      console.log(`Failed to create user: ${error.message}`);
+      this.logger.error(`Failed to create user: ${error.message}`);
       throw new HttpException(`${error.message}`, HttpStatus.BAD_REQUEST);
     }
   }
@@ -71,7 +78,7 @@ export class AuthService {
         );
       return this.signToken(user.id, user.email, user.role);
     } catch (error) {
-      console.log(error);
+      this.logger.error(error);
       throw new HttpException(`${error}`, HttpStatus.BAD_REQUEST);
     }
   }
@@ -79,12 +86,12 @@ export class AuthService {
   async signToken(
     userId: number,
     email: string,
-    role:"ADMIN" | "USER"
+    role: 'ADMIN' | 'USER',
   ): Promise<{ access_token: string }> {
     const payload = {
       sub: userId,
       email,
-      role
+      role,
     };
     const secret = this.config.get('JWT_SECRET');
 

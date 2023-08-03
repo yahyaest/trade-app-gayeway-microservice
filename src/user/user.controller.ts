@@ -17,11 +17,13 @@ import { Roles } from 'src/auth/decorator';
 import { CreateUserDto, UpdateUserDto } from './dto';
 import { CustomRequest } from './models/request.models';
 import { UserService } from './user.service';
+import { CustomLogger } from 'src/myLogger';
 
 @UseGuards(JwtGuard, RolesGuard)
 @Controller('api/users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+  private readonly logger = new CustomLogger(UserController.name);
 
   @Get('')
   @Roles('ADMIN')
@@ -29,9 +31,10 @@ export class UserController {
     //  return await this.userService.getUsersWithParams(query);
 
     try {
+      this.logger.log('Getting users...');
       return await this.userService.getUsersWithParams(query);
     } catch (error) {
-      console.log(`Failed to retrieve users: ${error.message}`);
+      this.logger.error(`Failed to retrieve users: ${error.message}`);
       throw new HttpException('No users found', HttpStatus.NOT_FOUND);
     }
   }
@@ -52,7 +55,7 @@ export class UserController {
       }
       return user;
     } catch (error) {
-      console.log(`Failed to retrieve user: ${error.message}`);
+      this.logger.error(`Failed to retrieve user: ${error.message}`);
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
   }
@@ -62,8 +65,7 @@ export class UserController {
     try {
       return await this.userService.addUser(createUserDto);
     } catch (error) {
-      console.log(error);
-      console.log(error);
+      this.logger.error(error);
       throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }
   }
@@ -76,7 +78,7 @@ export class UserController {
     try {
       return await this.userService.updateUser(id, updateUserDto);
     } catch (error) {
-      console.log(error);
+      this.logger.error(error);
       throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }
   }
@@ -92,19 +94,20 @@ export class UserController {
       }
       return user;
     } catch (error) {
-      console.log(`Failed to retrieve user: ${error.message}`);
+      this.logger.error(`Failed to retrieve user: ${error.message}`);
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
   }
 
   @Post('/is_user')
-  async isUser(@Body() body: {email:string}) {
+  async isUser(@Body() body: { email: string }) {
     try {
       const user = await this.userService.getUserByEmail(body.email);
       if (!user) return false;
+      this.logger.log(`User with email ${body.email} exist.`);
       return true;
     } catch (error) {
-      console.log(error);
+      this.logger.error(error);
       throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }
   }
