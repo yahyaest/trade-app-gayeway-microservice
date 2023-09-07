@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateImageDto, UpdateImageDto } from './dto';
-import { Image } from '@prisma/client';
 import { CustomRequest } from 'src/user/models/request.models';
 
 @Injectable()
