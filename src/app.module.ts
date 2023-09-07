@@ -6,11 +6,17 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { LoggerModule } from 'nestjs-pino';
+import { ImageModule } from './image/image.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
     }),
     LoggerModule.forRoot({
       pinoHttp: {
@@ -36,6 +42,7 @@ import { LoggerModule } from 'nestjs-pino';
     PrismaModule,
     AuthModule,
     UserModule,
+    ImageModule,
   ],
   controllers: [AppController],
   providers: [AppService],
