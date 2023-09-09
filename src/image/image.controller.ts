@@ -22,11 +22,15 @@ import { CreateImageDto, UpdateImageDto } from './dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import { UserService } from 'src/user/user.service';
 
 @UseGuards(JwtGuard, RolesGuard)
 @Controller('api/images')
 export class ImageController {
-  constructor(private readonly imageService: ImageService) {}
+  constructor(
+    private readonly imageService: ImageService,
+    private readonly userService: UserService,
+  ) {}
   private readonly logger = new CustomLogger(ImageController.name);
 
   @Get('')
@@ -78,10 +82,16 @@ export class ImageController {
     }),
   )
   async addImage(
-    @UploadedFile() file: Express.Multer.File, @Body() createImageDto: CreateImageDto
+    @UploadedFile() file: Express.Multer.File,
+    @Body() createImageDto: CreateImageDto,
+    @Req() req: CustomRequest,
   ) {
     try {
       createImageDto.filename = file.filename;
+      const currentUser = this.userService.getCurrentUser(req);
+      if (currentUser) {
+        createImageDto.userId = currentUser.id;
+      }
       return await this.imageService.addImage(createImageDto);
     } catch (error) {
       this.logger.error(error);
@@ -103,7 +113,6 @@ export class ImageController {
   }
 
   @Delete('/:id')
-  @Roles('ADMIN')
   async deleteImage(@Param('id') id: string) {
     try {
       const image = await this.imageService.removeImage(id);
