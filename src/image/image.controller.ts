@@ -35,13 +35,13 @@ export class ImageController {
 
   @Get('')
   @Roles('ADMIN')
-  async getImagesWithParams() {
+  async getImages() {
     try {
       this.logger.log('Getting images...');
       return await this.imageService.getImages();
     } catch (error) {
       this.logger.error(`Failed to retrieve images: ${error.message}`);
-      throw new HttpException('No images found', HttpStatus.NOT_FOUND);
+      throw new HttpException(error.message, HttpStatus.NOT_FOUND);
     }
   }
 
@@ -51,17 +51,20 @@ export class ImageController {
   }
 
   @Get('/:id')
-  @Roles('ADMIN')
-  async getImage(@Param('id') id: string) {
+  async getImage(@Param('id') id: string, @Req() req: CustomRequest) {
     try {
+      const user = req.user;
       const image = await this.imageService.getImage(id);
       if (!image) {
         throw new Error('Image not found');
       }
+      if (user.email !== image.username && user.role !== 'ADMIN') {
+        throw new Error('Image belong to another user');
+      }
       return image;
     } catch (error) {
       this.logger.error(`Failed to retrieve image: ${error.message}`);
-      throw new HttpException('Image not found', HttpStatus.NOT_FOUND);
+      throw new HttpException(error.message, HttpStatus.NOT_FOUND);
     }
   }
 
@@ -94,8 +97,8 @@ export class ImageController {
       }
       return await this.imageService.addImage(createImageDto);
     } catch (error) {
-      this.logger.error(error);
-      throw new HttpException(error, HttpStatus.BAD_REQUEST);
+      this.logger.error(error.message);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -103,26 +106,39 @@ export class ImageController {
   async updateImage(
     @Param('id') id: string,
     @Body() updateImageDto: UpdateImageDto,
+    @Req() req: CustomRequest,
   ) {
     try {
+      const user = req.user;
+      const image = await this.imageService.getImage(id);
+      if (!image) {
+        throw new Error('Image not found');
+      }
+      if (user.email !== image.username && user.role !== 'ADMIN') {
+        throw new Error('Image belong to another user');
+      }
       return await this.imageService.updateImage(id, updateImageDto);
     } catch (error) {
-      this.logger.error(error);
-      throw new HttpException(error, HttpStatus.BAD_REQUEST);
+      this.logger.error(error.message);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 
   @Delete('/:id')
-  async deleteImage(@Param('id') id: string) {
+  async deleteImage(@Param('id') id: string, @Req() req: CustomRequest) {
     try {
-      const image = await this.imageService.removeImage(id);
+      const user = req.user;
+      const image = await this.imageService.getImage(id);
       if (!image) {
         throw new Error('Image not found');
       }
-      return image;
+      if (user.email !== image.username && user.role !== 'ADMIN') {
+        throw new Error('Image belong to another user');
+      }
+      return await this.imageService.removeImage(id);
     } catch (error) {
       this.logger.error(`Failed to retrieve image: ${error.message}`);
-      throw new HttpException('Image not found', HttpStatus.NOT_FOUND);
+      throw new HttpException(error.message, HttpStatus.NOT_FOUND);
     }
   }
 }

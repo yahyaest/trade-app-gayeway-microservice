@@ -35,7 +35,7 @@ export class UserController {
       return await this.userService.getUsersWithParams(query);
     } catch (error) {
       this.logger.error(`Failed to retrieve users: ${error.message}`);
-      throw new HttpException('No users found', HttpStatus.NOT_FOUND);
+      throw new HttpException(error.message, HttpStatus.NOT_FOUND);
     }
   }
 
@@ -45,18 +45,20 @@ export class UserController {
   }
 
   @Get('/:id')
-  @Roles('ADMIN')
-  async getUser(@Param('id') id: string) {
-    // return await this.userService.getUser(id);
+  async getUser(@Param('id') id: string, @Req() req: CustomRequest) {
     try {
+      const currentUser = req.user;
       const user = await this.userService.getUser(id);
       if (!user) {
         throw new Error('User not found');
       }
-      return user;
+      if (currentUser.email !== user.email && currentUser.role !== 'ADMIN') {
+        throw new Error('Data belong to another user');
+      }
+      return user; 
     } catch (error) {
       this.logger.error(`Failed to retrieve user: ${error.message}`);
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      throw new HttpException(error.message, HttpStatus.NOT_FOUND);
     }
   }
 
@@ -65,8 +67,8 @@ export class UserController {
     try {
       return await this.userService.addUser(createUserDto);
     } catch (error) {
-      this.logger.error(error);
-      throw new HttpException(error, HttpStatus.BAD_REQUEST);
+      this.logger.error(error.message);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -74,12 +76,21 @@ export class UserController {
   async updateUser(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
+    @Req() req: CustomRequest
   ) {
     try {
+      const currentUser = req.user;
+      const user = await this.userService.getUser(id);
+      if (!user) {
+        throw new Error('User not found');
+      }
+      if (currentUser.email !== user.email && currentUser.role !== 'ADMIN') {
+        throw new Error('Data belong to another user');
+      }
       return await this.userService.updateUser(id, updateUserDto);
     } catch (error) {
-      this.logger.error(error);
-      throw new HttpException(error, HttpStatus.BAD_REQUEST);
+      this.logger.error(error.message);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -95,7 +106,7 @@ export class UserController {
       return user;
     } catch (error) {
       this.logger.error(`Failed to retrieve user: ${error.message}`);
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      throw new HttpException(error.message, HttpStatus.NOT_FOUND);
     }
   }
 
@@ -107,8 +118,8 @@ export class UserController {
       this.logger.log(`User with email ${body.email} exist.`);
       return true;
     } catch (error) {
-      this.logger.error(error);
-      throw new HttpException(error, HttpStatus.BAD_REQUEST);
+      this.logger.error(error.message);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 }
