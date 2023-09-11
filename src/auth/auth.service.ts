@@ -43,6 +43,7 @@ export class AuthService {
           password: hash,
           role: dto.role ? dto.role : 'USER',
           username: dto.username ? dto.username : null,
+          phone: dto.phone ? dto.phone : null,
         },
       });
 
