@@ -16,6 +16,10 @@ async getImage(id: string) {
   return await this.prisma.image.findUnique({ where: { id: +id } });
 }
 
+async getImagesWithParams(query: Object) {
+  return await this.prisma.image.findMany({ where: query });
+}
+
 async getImageByEmail(username: string) {
   return await this.prisma.image.findUnique({ where: { username: username } });
 }

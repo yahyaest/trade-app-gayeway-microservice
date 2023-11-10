@@ -8,6 +8,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   UseGuards,
   UseInterceptors,
@@ -35,10 +36,10 @@ export class ImageController {
 
   @Get('')
   @Roles('ADMIN')
-  async getImages() {
+  async getImagesWithParams(@Query() query: Object) {
     try {
       this.logger.log('Getting images...');
-      return await this.imageService.getImages();
+      return await this.imageService.getImagesWithParams(query);
     } catch (error) {
       this.logger.error(`Failed to retrieve images: ${error.message}`);
       throw new HttpException(error.message, HttpStatus.NOT_FOUND);
