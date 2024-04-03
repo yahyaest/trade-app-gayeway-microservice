@@ -8,6 +8,14 @@ services:
     restart: unless-stopped
     ports:
       - 3000:3000
+    environment:
+      - BASE_URL=http://localhost:3000
+      - TZ=Africa/Tunis
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/gateway?schema=public
+      - JWT_SECRET=super-secret
+      - CLIENT_URL=http://localhost:3000
+      - CLIENT_DOMAIN=localhost
+    entrypoint: /app/entrypoint.sh
     depends_on:
       - postgres
     volumes:
