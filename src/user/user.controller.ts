@@ -19,7 +19,7 @@ import { CustomRequest } from './models/request.models';
 import { UserService } from './user.service';
 import { CustomLogger } from 'src/myLogger';
 
-@UseGuards(JwtGuard, RolesGuard)
+// @UseGuards(JwtGuard, RolesGuard)
 @Controller('api/users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -34,14 +34,23 @@ export class UserController {
       this.logger.log('Getting users...');
       return await this.userService.getUsersWithParams(query);
     } catch (error) {
-      this.logger.error(`Failed to retrieve users: ${error.message}`);
+      this.logger.error(
+        `Failed to retrieve users: ${JSON.stringify(error.message)}`,
+      );
       throw new HttpException(error.message, HttpStatus.NOT_FOUND);
     }
   }
 
   @Get('/me')
   getCurrentUser(@Req() req: CustomRequest) {
-    return this.userService.getCurrentUser(req);
+    try {
+      this.logger.log(`Getting req cookies`);
+      this.logger.log(`req cookies are : ${req}`);
+      return this.userService.getCurrentUser(req);
+    } catch (error) {
+      this.logger.error(`Failed to retrieve current user: ${error.message}`);
+      throw new HttpException(error.message, HttpStatus.NOT_FOUND);
+    }
   }
 
   @Get('/:id')
@@ -55,7 +64,7 @@ export class UserController {
       if (currentUser.email !== user.email && currentUser.role !== 'ADMIN') {
         throw new Error('Data belong to another user');
       }
-      return user; 
+      return user;
     } catch (error) {
       this.logger.error(`Failed to retrieve user: ${error.message}`);
       throw new HttpException(error.message, HttpStatus.NOT_FOUND);
@@ -76,7 +85,7 @@ export class UserController {
   async updateUser(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
-    @Req() req: CustomRequest
+    @Req() req: CustomRequest,
   ) {
     try {
       const currentUser = req.user;
