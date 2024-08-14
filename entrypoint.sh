@@ -11,14 +11,15 @@ echo "JWT_SECRET=${JWT_SECRET}" >> /app/.env
 echo "CLIENT_URL=${CLIENT_URL}" >> /app/.env
 echo "CLIENT_DOMAIN=${CLIENT_DOMAIN}" >> /app/.env
 
-# Change to the app directory
-cd /app
+env
 
 # Continue with the CMD (your main application command)
 # exec "$@"
 
 if [ "$ENV" = "PROD" ]
 then
+    # Change to the app directory
+    cd /app
     npm run build
     npm run start:migrate:prod
 else

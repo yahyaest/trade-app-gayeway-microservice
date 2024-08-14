@@ -64,6 +64,9 @@ FROM node:18-alpine As production
 # Copy the bundled code from the build stage to the production image
 COPY --chown=node:node --from=build /app/node_modules ./node_modules
 COPY --chown=node:node --from=build /app/dist ./dist
+COPY --chown=node:node --from=build /app ./app
+
+RUN rm -rf ./app/node_modules
 
 RUN npm rebuild bcrypt --build-from-source
 
