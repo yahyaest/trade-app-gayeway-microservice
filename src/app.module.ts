@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
@@ -9,6 +9,7 @@ import { LoggerModule } from 'nestjs-pino';
 import { ImageModule } from './image/image.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { ReverseProxyWalletMiddleware } from './middleware/proxy-wallet.middleware';
 
 @Module({
   imports: [
@@ -48,3 +49,11 @@ import { join } from 'path';
   providers: [AppService],
 })
 export class AppModule {}
+// export class AppModule implements NestModule {
+//   configure(consumer: MiddlewareConsumer) {
+//       consumer.apply(ReverseProxyWalletMiddleware)
+//       .forRoutes({
+//         path: 'trade-wallet/*', method: RequestMethod.ALL
+//       });
+//   }
+// }

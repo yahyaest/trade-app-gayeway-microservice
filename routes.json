@@ -1,0 +1,22 @@
+[
+  {
+    "service": "trade-crypto",
+    "route": "/trade-crypto",
+    "target": "http://crypto:3000"
+  },
+  {
+    "service": "trade-wallet",
+    "route": "/trade-wallet",
+    "target": "http://wallet:3000"
+  },
+  {
+    "service": "trade-notification",
+    "route": "/trade-notification",
+    "target": "http://notification:8000"
+  },
+  {
+    "service": "trade-task-scheduler",
+    "route": "/trade-task-scheduler",
+    "target": "http://task-scheduler:5000"
+  }
+]
