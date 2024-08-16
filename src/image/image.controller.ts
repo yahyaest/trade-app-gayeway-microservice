@@ -73,7 +73,7 @@ export class ImageController {
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
-        destination: './uploads',
+        destination: './uploads/uploads',
         filename: (req, file, cb) => {
           const randomName = Array(32)
             .fill(null)
@@ -91,7 +91,7 @@ export class ImageController {
     @Req() req: CustomRequest,
   ) {
     try {
-      createImageDto.filename = file.filename;
+      createImageDto.filename = `uploads/${file.filename}`;
       const currentUser = this.userService.getCurrentUser(req);
       if (currentUser) {
         createImageDto.userId = currentUser.id;
